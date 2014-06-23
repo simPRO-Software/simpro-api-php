@@ -108,9 +108,9 @@ class Client implements \Psr\Log\LoggerAwareInterface {
         $rpcRequest = new \Tivoka\Client\Request($method, $args);
         $this->connection->send($rpcRequest);
         // check for errors
-        if($rpcRequest->isError()) {
-            $this->logger->error("Request Failed", array("host"=>$this->host, "method"=>$method, "args"=>$args, "errorMessage"=>$rpcRequest->errorMessage));
-            throw new \Tivoka\Exception\RemoteProcedureException($rpcRequest->errorMessage, $rpcRequest->error);
+        if($rpcRequest->error !== null) {
+            $this->logger->error("Request Failed", array("host"=>$this->host, "method"=>$method, "args"=>$args, "errorMessage"=>$rpcRequest->errorData["faultString"]));
+            throw new \Tivoka\Exception\RemoteProcedureException($rpcRequest->errorData["faultString"], $rpcRequest->errorData["faultCode"]);
         }
         // return the result if successul
         return $rpcRequest->result;
